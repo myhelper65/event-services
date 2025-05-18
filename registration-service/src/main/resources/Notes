@@ -1,0 +1,281 @@
+docker compose up -d
+docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                      NAMES
+701c13d37d4c   mongo     "docker-entrypoint.s…"   23 minutes ago   Up 23 minutes   0.0.0.0:27017->27017/tcp   03-database-spring-data-1-mongo-1
+
+
+docker exec -it 03-database-spring-data-1-mongo-1 mongosh
+Current Mongosh Log ID: 6823765aa8c990534cd861df
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.0
+Using MongoDB:          8.0.9
+Using Mongosh:          2.5.0
+
+
+docker ps
+show collections
+db.registrations.find()
+
+ docker compose down
+
+
+docker exec -it 03-database-spring-data-1-postgres-1 psql -U pluralsight -d pluralsight
+
+pluralsight-# \dt
+             List of relations
+ Schema |    Name    | Type  |    Owner
+--------+------------+-------+-------------
+ public | events     | table | pluralsight
+ public | organizers | table | pluralsight
+ public | products   | table | pluralsight
+ public | venues     | table | pluralsight
+(4 rows)
+
+
+pluralsight=# select * from events;
+ id  |  end_date  |             name             | start_date | organizer_id | venue_id
+-----+------------+------------------------------+------------+--------------+----------
+ 501 | 2023-10-04 | Globomantics Tech Conference | 2023-10-02 |          101 |      201
+ 502 | 2024-01-10 | Globomantics Developer Day   | 2024-01-10 |          101 |      201
+ 503 | 2024-02-29 | Carved Rock New Products Day | 2024-02-29 |          102 |      202
+(3 rows)
+
+
+./mvnw spring-boot:run -Dspring-boot.run.profiles=testdata  ==this will go and find application-testdata.yaml then run this
+
+
+
+===================================================
+ Example URLs to Use:
+http://localhost:8080/registrations
+→ First page, 10 items, sorted by id ascending (default)
+
+http://localhost:8080/registrations?page=1&size=5
+→ Second page (page=1), 5 items per page, default sort
+
+http://localhost:8080/registrations?sortBy=attendeeName&direction=desc
+→ Sort by attendeeName descending
+
+http://localhost:8080/registrations?page=2&size=3&sortBy=productId&direction=asc
+→ Page 3 (index 2), 3 per page, sort by productId ascending
+
+===============================section 5============================================
+if running results error
+ ./mvnw spring-boot:run -Dspring-boot.run.profiles=testdata
+
+which: no javac in
+run below commands
+
+export JAVA_HOME="C:\Users\myhel\.jdks\openjdk-21.0.2"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+java -version --should return a java
+
+
+=============actuator=================
+http://localhost:8080/actuator/loggers/org.springframework.web
+
+### Create a new registration
+
+POST localhost:8080/registrations
+Content-Type: application/json
+
+{"productId": 801, "attendeeName": "Jesper de Jong"}
+
+### Get all registrations
+
+GET localhost:8080/registrations
+Accept: application/json
+
+### Get a list of Actuator endpoints
+
+GET localhost:8080/actuator
+
+### Check service health
+
+GET localhost:8080/actuator/health
+
+### Get information about request mappings
+
+GET localhost:8080/actuator/mappings
+
+### Get logging level
+
+GET localhost:8080/actuator/loggers/org.springframework.web
+
+### Change logging level
+
+POST localhost:8080/actuator/loggers/org.springframework.web
+Content-Type: application/json
+
+{"configuredLevel": "DEBUG"}
+
+### Metrics overview
+
+GET localhost:8080/actuator/metrics/http.server.requests
+
+### Show the number of POST requests to the path /registrations
+
+GET localhost:8080/actuator/metrics/http.server.requests?tag=method:POST&tag=uri:/registrations
+
+
+
+=============================================================
+implement actuator prometheus and grafana
+
+
+   <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-actuator</artifactId>
+   </dependency>
+   <dependency>
+       <groupId>io.micrometer</groupId>
+       <artifactId>micrometer-registry-prometheus</artifactId>
+   </dependency>
+==============================================
+add prometheus to application.yaml
+
+==========================================
+  tickets:
+    events:
+      url: http://localhost:8081
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health, env, beans, conditions, mappings, loggers, metrics, info, prometheus
+    endpoint:
+      health:
+        show-details: always
+      env:
+        show-values: always
+      prometheus:
+        enabled: true
+============================================
+
+Run Your Spring Boot App
+Spring Boot will expose metrics at:
+
+http://localhost:8080/actuator/prometheus
+
+======================================================
+Configure Prometheus to Scrape Metrics .create prometheus.yaml under application.yaml
+In prometheus.yml:
+
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'spring-boot-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']  # or whatever port your Spring Boot app runs on
+
+      =====================================================
+
+docker run -d   -p 9090:9090   -v "$(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml"   prom/prometheus
+ docker ps
+CONTAINER ID   IMAGE             COMMAND                  CREATED         STATUS         PORTS                      NAMES
+bd090bab5fa7   prom/prometheus   "/bin/prometheus --c…"   7 minutes ago   Up 7 minutes   0.0.0.0:9090->9090/tcp     wonderful_vaughan
+a2a68ab3bf84   postgres          "docker-entrypoint.s…"   2 days ago      Up 2 days      0.0.0.0:5432->5432/tcp     04-calling-web-services-postgres-1
+187bc2dc202f   mongo             "docker-entrypoint.s…"   2 days ago      Up 2 days      0.0.0.0:27017->27017/tcp   04-calling-web-services-mongo-1
+
+we are running prometheus in docker
+
+access prometheus
+http://localhost:9090/targets ==this checks prometheus is running
+
+http://localhost:8080/actuator/prometheus ==check if prometheus UI is up
+
+
+==========================INTEGRATE GRAFANA=========================
+Connect Grafana to Prometheus
+Start Grafana (docker run -d -p 3000:3000 grafana/grafana)
+
+$ docker ps
+CONTAINER ID   IMAGE             COMMAND                  CREATED              STATUS              PORTS                      NAMES
+c90d25ee04b5   grafana/grafana   "/run.sh"                About a minute ago   Up About a minute   0.0.0.0:3000->3000/tcp     boring_sutherland
+bd090bab5fa7   prom/prometheus   "/bin/prometheus --c…"   11 minutes ago       Up 11 minutes       0.0.0.0:9090->9090/tcp     wonderful_vaughan
+a2a68ab3bf84   postgres          "docker-entrypoint.s…"   2 days ago           Up 2 days           0.0.0.0:5432->5432/tcp     04-calling-web-services-postgres-1
+187bc2dc202f   mongo             "docker-entrypoint.s…"   2 days ago           Up 2 days           0.0.0.0:27017->27017/tcp   04-calling-web-services-mongo-1
+
+
+
+Go to: http://localhost:3000
+Default user: admin / admin
+
+Add data source → Prometheus
+URL: http://host.docker.internal:9090 ==we use docker thats why
+
+mport Spring Boot Dashboard
+Go to Dashboards > Import
+Use one of the public dashboards for Spring Boot + Micrometer:
+Example ID: 4701 (Micrometer dashboard)
+Customize panels as needed.
+
+
+==========================================================================
+lets add elastic search and kibana to spring boot application
+
+
+
+
+
+
+actuator====================
+Let's see how we can use Spring Boot Actuator in practice.
+ We are starting with a code that we finished with in the previous module.
+  Make sure that you have PostgreSQL and MongoDB running, and also the events‑service.
+   Now, let's see how we can add Actuator to the registration service.
+  The only thing we have to do is add a dependency on spring‑boot‑starter‑actuator to the registration‑service.
+    We don't have to configure anything or change the code. The Spring Boot Autoconfiguration mechanism takes care of everything.
+     Let's run the registration‑service and see what we've got. The application now has an extra web service that we can reach on the path localhost:8080/actuator.
+      When we execute a get request on this path, we get some information about the endpoints that are available.
+   By default, Actuator exposes only one endpoint, which is the health endpoint. Let's try calling it by executing a get request on localhost:8080/actuator/health.
+    It gives us a short response with the status of the application, which is up. The health endpoint can give us more details if we configure this in the application.yml configuration file.
+     We can set management, endpoint, health, show‑details to always. We need to restart a registration‑service to let this take effect, and then we can again execute a get request to the health endpoint.
+      We now get more information, for example, how much disk space is available, and it also tells us that the connection with MongoDB is up. To get more endpoints, there are two things to consider.
+      The endpoint must be enabled, and it must also be exposed. Most of the standard endpoints are enabled by default, but not exposed. Only the health endpoint is enabled and exposed by default.
+       That's why we could use it without any further configuration.
+       The reason why most endpoints are not exposed by default is because of security.
+       Actuator endpoints provide information about your application that might be interesting to hackers,
+       so you should think about what endpoints you really need to expose and who has access to them.
+        We will not focus on security in this course, but in any real project, it is of course very important to think carefully about security.
+         With that said, let's expose some more endpoints to see what's available. In the application.yml file,
+         we'll expose a bunch of endpoints by setting the management, endpoints, web, exposure, include property to a list of endpoint names.
+We'll restart our registration‑service and see what these endpoints provide. Let's first execute a get request on localhost:8080/actuator again .
+ Here we can see that there are now indeed more endpoints available.
+ Let's take a quick look at some of the ones we've added. There's the env endpoint, which provides information about the configuration of the application.
+ It shows a long list of environment settings, including what it has picked up from the application.yml configuration file. Note that by default,
+ it does not show the values of the properties for security reasons.
+ We can make it show the values by setting management, endpoint, env, show‑values to always.
+  After restarting the service and calling the env endpoint again, we can now see the values.
+ For example, we can see that it talks to the events‑service at localhost:8081,
+and we can even see exactly where it got this setting from, which is line 3 column 10 of the application.yml configuration file.
+  Other endpoints we've exposed here that are very useful for debugging are the beans, conditions, and mappings endpoints.
+  The beans endpoint gives you a huge amount of information about the beans in the application context.
+This can be useful if you need to know exactly what beans are registered and how they are configured.
+ The conditions endpoint gives you the Spring Boot Autoconfiguration report in JSON format.
+ Remember that when we discussed autoconfiguration, you could get a
+  report on what conditions matched by starting the application with the ‑‑debug option. With this Actuator endpoint,
+  you can get this information from the running application.
+  The mappings endpoint gives you information about how Spring Web MVC and Spring WebFlux map HTTP requests to controller methods.
+   This is very useful if a mapping doesn't behave the way you expect it and you want to find out why.
+ Try running the demo application yourself and experiment with making requests to these endpoints and see what information they give you.
+ I want to show you one more thing, which is the loggers endpoint.
+ This allows you to see the log level of loggers in the application and also makes it possible to change logging levels on the fly.
+ Let's execute a get request on localhost:8080/actuator/loggers/org. springframework.web. This will tell you that the log level of the logger org.springframework.web is set to info.
+  To change this, we can make a post request to this path. In the body of the request, we give a JSON object with a property named configuredLevel. Let's set the level to debug.
+   If we now look at the logging of the registration‑service,
+    we can see that we get debug level messages from Spring Web MVC.eing able to change the logging level while the application is
+    running is extremely useful for diagnosing problems.
+
+    ========================================================================
+
+    https://micrometer.io/
+
+====================to build docker images using maven plugin================================
+
+cd event-service
+ ./mvnw spring-boot:build-image
+
