@@ -1,5 +1,7 @@
 server:
   port: 8081
+  address: 0.0.0.0
+
 spring:
   datasource:
     url: jdbc:postgresql://postgres:5432/pluralsight
@@ -15,3 +17,12 @@ spring:
   sql:
     init:
       mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
