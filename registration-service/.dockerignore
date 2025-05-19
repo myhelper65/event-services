@@ -1,0 +1,18 @@
+# Build output
+
+*.class
+
+# IDE files
+.idea/
+*.iml
+
+# Git files
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# Mac/Windows trash
+.DS_Store
+Thumbs.db
