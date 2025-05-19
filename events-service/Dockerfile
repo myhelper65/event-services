@@ -1,4 +1,10 @@
 FROM eclipse-temurin:21
-ADD target/events-service-0.0.1-SNAPSHOT.jar events-service.jar
+
+# Add your application JAR
+ADD target/events-service-0.0.1-SNAPSHOT.jar /app.jar
+
+# Expose the application port
 EXPOSE 8081
-ENTRYPOINT ["java","-jar","events-service.jar"]
+
+# Set a more secure and startup-optimized Java entrypoint
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app.jar"]
