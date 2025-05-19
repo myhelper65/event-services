@@ -1,0 +1,114 @@
+If you want to **remove both `application.yml` and `application-docker.yml`** and still have your Spring Boot application configured correctly, you need to replace them with a **single configuration file** or provide configuration **entirely via environment variables**, `application.properties`, or command-line arguments.
+
+---
+
+## ✅ Option 1: Use a Single `application.yml`
+
+You can delete both `application.yml` and `application-docker.yml`, and create **one simplified configuration file** that works in both local and Docker contexts.
+
+### 🔧 Create This: `events-service/src/main/resources/application.yml`
+
+```yaml
+server:
+  port: 8081
+  address: 0.0.0.0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/pluralsight
+    username: pluralsight
+    password: pluralsight
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+```
+
+This file will be used in all environments by default (no need to set `SPRING_PROFILES_ACTIVE`).
+
+---
+
+## ✅ Option 2: Use Environment Variables Only (No YAML at All)
+
+If you **don’t want any config files** and prefer Docker-style setup, configure everything via environment variables in your Dockerfile or `docker-compose.yml`.
+
+### 📦 Dockerfile Example
+
+```dockerfile
+FROM openjdk:17-jdk-slim
+COPY target/events-service-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+### 🐳 docker-compose.yml (for `event-service`)
+
+```yaml
+services:
+  events:
+    build:
+      context: ./events-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pluralsight
+      SPRING_DATASOURCE_USERNAME: pluralsight
+      SPRING_DATASOURCE_PASSWORD: pluralsight
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_SQL_INIT_MODE: always
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
+      SERVER_PORT: 8081
+      SERVER_ADDRESS: 0.0.0.0
+```
+
+This completely removes the need for YAML files. The application will pick these up directly.
+
+---
+
+## 🛠 Recommendation
+
+**Best Practice**:
+Use a single `application.yml` (Option 1) unless you are building a 12-factor app or need maximum Docker config flexibility (Option 2).
+
+---
+
+## 🧹 Cleanup Steps
+
+To switch cleanly:
+
+1. **Delete**:
+
+   * `events-service/src/main/resources/application.yml`
+   * `events-service/src/main/resources/application-docker.yml`
+
+2. **Choose One**:
+
+   * ✅ Create a single `application.yml` as above **OR**
+   * ✅ Set environment variables in `docker-compose.yml`
+
+3. **Rebuild Docker**:
+
+```bash
+docker-compose down -v
+docker-compose up --build
+```
+
+---
+
+

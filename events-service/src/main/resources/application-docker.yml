@@ -1,28 +1,45 @@
-server:
-  port: 8081
-  address: 0.0.0.0
+# # Shared default settings
+# server:
+#   port: 8081
 
-spring:
-  datasource:
-    url: jdbc:postgresql://postgres:5432/pluralsight
-    username: pluralsight
-    password: pluralsight
-  jpa:
-    hibernate:
-      ddl-auto: none
-    open-in-view: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  sql:
-    init:
-      mode: always
+# spring:
+#   datasource:
+#     url: jdbc:postgresql://localhost:5432/pluralsight
+#     username: pluralsight
+#     password: pluralsight
+#   jpa:
+#     hibernate:
+#       ddl-auto: none
+#     open-in-view: false
+#     properties:
+#       hibernate:
+#         dialect: org.hibernate.dialect.PostgreSQLDialect
+#   sql:
+#     init:
+#       mode: never
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
+# # Docker profile overrides
+# ---
+# spring:
+#   config:
+#     activate:
+#       on-profile: docker
+
+# server:
+#   address: 0.0.0.0
+
+# spring:
+#   datasource:
+#     url: jdbc:postgresql://postgres:5432/pluralsight
+#   sql:
+#     init:
+#       mode: always
+
+# management:
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health,info
+#   endpoint:
+#     health:
+#       show-details: always

@@ -1,6 +1,39 @@
+# Default (local dev)
+spring:
+  data:
+    mongodb:
+      host: localhost  # or omit if using MongoDB URI
+
 tickets:
   events:
     url: http://localhost:8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,env,beans,conditions,mappings,loggers,metrics
+  endpoint:
+    health:
+      show-details: always
+    env:
+      show-values: always
+
+# Docker profile
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+spring:
+  data:
+    mongodb:
+      host: mongo
+
+tickets:
+  events:
+    url: http://events:8081
 
 management:
   endpoints:

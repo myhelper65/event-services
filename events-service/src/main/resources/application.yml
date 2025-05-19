@@ -1,5 +1,7 @@
+# Shared default settings
 server:
   port: 8081
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/pluralsight
@@ -15,3 +17,29 @@ spring:
   sql:
     init:
       mode: never
+
+# Docker profile overrides
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+server:
+  address: 0.0.0.0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/pluralsight
+  sql:
+    init:
+      mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
