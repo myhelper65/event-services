@@ -1,7 +1,8 @@
 FROM eclipse-temurin:21
-
+ENV SPRING_PROFILES_ACTIVE docker
 # Add your application JAR to a consistent path
-ADD target/registration-service-0.0.1-SNAPSHOT.jar /app.jar
+# ADD target/registration-service-0.0.1-SNAPSHOT.jar /app.jar
+COPY ./target/*.jar /app.jar
 
 # Expose the application port
 EXPOSE 8080
