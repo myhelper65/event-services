@@ -2,7 +2,8 @@ server:
   port: 8081
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/pluralsight
+    # url: jdbc:postgresql://postgres:5432/pluralsight
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/pluralsight}
     username: pluralsight
     password: pluralsight
   jpa:
