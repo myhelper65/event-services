@@ -74,15 +74,16 @@ EOF
 
 }
 
-resource "aws-iam-role-policy-attachment" "eventserver-s3-policy" {
-  role       = aws_iam_role.eventserver_master_server_s3-role.name
+resource "aws_iam_role_policy_attachment" "eventserver_s3_policy" {
+  role       = aws_iam_role.eventserver_master_server_s3_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
-resource "aws-iam-instance-profile" "eventserver-master-server-profile" {
+resource "aws_iam_instance_profile" "eventserver_master_server_profile" {
   name = "eventserver-master-server-profile"
-  role = aws_iam_role.eventserver-master-server-s3-role.name
+  role = aws_iam_role.eventserver_master_server_s3_role.name
 }
+
 
 resource "aws_instance" "kube-master" {
   ami                    = "ami-005fc0f236362e99f"
