@@ -54,7 +54,7 @@ resource "aws_security_group" "k8s-sec-gr" {
 }
 
 
-resource "aws_iam_role" "eventserver-master-server-s3-role" {
+resource "aws-iam-role" "evenserver-master-server-s3-role" {
   name               = "eventserver-master-server-role"
   assume_role_policy = <<EOF
 {
