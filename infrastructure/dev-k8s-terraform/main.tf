@@ -54,7 +54,7 @@ resource "aws_security_group" "k8s-sec-gr" {
 }
 
 
-resource "aws_iam_role" "eventserver-master-server-s3-role" {
+resource "aws_iam_role" "eventserver_ansible_test_dev_keyserver_master_server_s3_role" {
   name               = "eventserver-master-server-role"
   assume_role_policy = <<EOF
 {
@@ -71,23 +71,23 @@ resource "aws_iam_role" "eventserver-master-server-s3-role" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role_policy_attachment" "eventserver_s3_policy" {
-  role       = aws_iam_role.eventserver-master-server-s3-role.name
+  role       = aws_iam_role.eventserver_ansible_test_dev_keyserver_master_server_s3_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
-resource "aws_iam_instance_profile" "eventserver-master-server-profile" {
+resource "aws_iam_instance_profile" "eventserver_master_server_profile" {
   name = "eventserver-master-server-profile"
-  role = aws_iam_role.eventserver-master-server-s3-role.name
+  role = aws_iam_role.eventserver_ansible_test_dev_keyserver_master_server_s3_role.name
 }
 
 resource "aws_instance" "kube-master" {
   ami = "ami-005fc0f236362e99f"
   instance_type = "t3a.medium"
-  iam_instance_profile = aws_iam_instance_profile.eventserver-master-server-profile.name
+ iam_instance_profile = aws_iam_instance_profile.eventserver_master_server_profile.name
+
   vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
   key_name = "event"
   subnet_id = "subnet-042907c137a98e049"  # select own subnet_id of us-east-1a
@@ -122,7 +122,7 @@ resource "aws_instance" "worker-2" {
   instance_type = "t3a.medium"
   vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
   key_name = "event"
-  subnet_id = "subnet-c41ba589"  # select own subnet_id of us-east-1a
+  subnet_id = "subnet-042907c137a98e049"  # select own subnet_id of us-east-1a
   availability_zone = "us-east-1a"
   tags = {
     Name = "worker-2"
