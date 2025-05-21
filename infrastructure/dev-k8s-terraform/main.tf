@@ -2,19 +2,20 @@ provider "aws" {
   region = "us-east-1"
 }
 
-variable "sec-gr-k8s" {
+variable "sec_gr_k8s" {
   default = "eventserver-k8s-sec-group"
 }
 
-data "aws_vpc" "name" {
+data "aws_vpc" "default" {
   default = true
 }
 
-resource "aws_security_group" "k8s-sec-gr" {
-  name   = var.sec-gr-k8s
-  vpc_id = data.aws_vpc.name.id
+resource "aws_security_group" "k8s_sec_gr" {
+  name   = var.sec_gr_k8s
+  vpc_id = data.aws_vpc.default.id
+
   tags = {
-    Name = var.sec-gr-k8s
+    Name = var.sec_gr_k8s
   }
 
   ingress {
@@ -53,9 +54,8 @@ resource "aws_security_group" "k8s-sec-gr" {
   }
 }
 
-
-resource "aws-iam-role" "evenserver-master-server-s3-role" {
-  name               = "eventserver-master-server-role"
+resource "aws_iam_role" "eventserver_master_server_s3_role" {
+  name = "eventserver-master-server-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -71,7 +71,6 @@ resource "aws-iam-role" "evenserver-master-server-s3-role" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role_policy_attachment" "eventserver_s3_policy" {
@@ -84,15 +83,15 @@ resource "aws_iam_instance_profile" "eventserver_master_server_profile" {
   role = aws_iam_role.eventserver_master_server_s3_role.name
 }
 
-
-resource "aws_instance" "kube-master" {
+resource "aws_instance" "kube_master" {
   ami                    = "ami-005fc0f236362e99f"
   instance_type          = "t3a.medium"
-  iam_instance_profile   = aws_iam_instance_profile.eventserver-master-server-profile.name
-  vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
+  iam_instance_profile   = aws_iam_instance_profile.eventserver_master_server_profile.name
+  vpc_security_group_ids = [aws_security_group.k8s_sec_gr.id]
   key_name               = "event"
-  subnet_id              = "subnet-042907c137a98e049" # select own subnet_id of us-east-1a
+  subnet_id              = "subnet-042907c137a98e049"
   availability_zone      = "us-east-1a"
+
   tags = {
     Name        = "kube-master"
     Project     = "tera-kube-ans"
@@ -102,13 +101,14 @@ resource "aws_instance" "kube-master" {
   }
 }
 
-resource "aws_instance" "worker-1" {
+resource "aws_instance" "worker_1" {
   ami                    = "ami-005fc0f236362e99f"
   instance_type          = "t3a.medium"
-  vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
+  vpc_security_group_ids = [aws_security_group.k8s_sec_gr.id]
   key_name               = "event"
-  subnet_id              = "subnet-042907c137a98e049" # select own subnet_id of us-east-1a
+  subnet_id              = "subnet-042907c137a98e049"
   availability_zone      = "us-east-1a"
+
   tags = {
     Name        = "worker-1"
     Project     = "tera-kube-ans"
@@ -118,13 +118,14 @@ resource "aws_instance" "worker-1" {
   }
 }
 
-resource "aws_instance" "worker-2" {
+resource "aws_instance" "worker_2" {
   ami                    = "ami-005fc0f236362e99f"
   instance_type          = "t3a.medium"
-  vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
+  vpc_security_group_ids = [aws_security_group.k8s_sec_gr.id]
   key_name               = "event"
-  subnet_id              = "subnet-042907c137a98e049" # select own subnet_id of us-east-1a
+  subnet_id              = "subnet-042907c137a98e049"
   availability_zone      = "us-east-1a"
+
   tags = {
     Name        = "worker-2"
     Project     = "tera-kube-ans"
@@ -135,19 +136,19 @@ resource "aws_instance" "worker-2" {
 }
 
 output "kube-master-ip" {
-  value       = aws_instance.kube-master.public_ip
+  value       = aws_instance.kube_master.public_ip
   sensitive   = false
-  description = "public ip of the kube-master"
+  description = "Public IP of the kube-master"
 }
 
 output "worker-1-ip" {
-  value       = aws_instance.worker-1.public_ip
+  value       = aws_instance.worker_1.public_ip
   sensitive   = false
-  description = "public ip of the worker-1"
+  description = "Public IP of the worker-1"
 }
 
 output "worker-2-ip" {
-  value       = aws_instance.worker-2.public_ip
+  value       = aws_instance.worker_2.public_ip
   sensitive   = false
-  description = "public ip of the worker-2"
+  description = "Public IP of the worker-2"
 }
