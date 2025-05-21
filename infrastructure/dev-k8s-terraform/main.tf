@@ -2,20 +2,19 @@ provider "aws" {
   region = "us-east-1"
 }
 
-variable "sec_gr_k8s" {
-  default = "eventserver-k8s-sec-group"
+variable "sec-gr-k8s" {
+  default = "event-service-k8s-sec-group"
 }
 
-data "aws_vpc" "default" {
+data "aws_vpc" "name" {
   default = true
 }
 
-resource "aws_security_group" "k8s_sec_gr" {
-  name   = var.sec_gr_k8s
-  vpc_id = data.aws_vpc.default.id
-
+resource "aws_security_group" "k8s-sec-gr" {
+  name   = var.sec-gr-k8s
+  vpc_id = data.aws_vpc.name.id
   tags = {
-    Name = var.sec_gr_k8s
+    Name = var.sec-gr-k8s
   }
 
   ingress {
@@ -33,9 +32,9 @@ resource "aws_security_group" "k8s_sec_gr" {
   }
 
   ingress {
+    protocol    = "tcp"
     from_port   = 6443
     to_port     = 6443
-    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -48,14 +47,15 @@ resource "aws_security_group" "k8s_sec_gr" {
 
   egress {
     from_port   = 0
-    to_port     = 0
     protocol    = "-1"
+    to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_iam_role" "eventserver_keyserver_master_s3_role" {
-  name               = "eventserver-master-server-role"
+
+resource "aws_iam_role" "event-service-master-server-s3-role" {
+  name               = "event-service-master-server-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -71,27 +71,27 @@ resource "aws_iam_role" "eventserver_keyserver_master_s3_role" {
   ]
 }
 EOF
+
 }
 
-resource "aws_iam_role_policy_attachment" "eventserver_keyserver_s3_policy" {
-  role       = aws_iam_role.eventserver_keyserver_master_s3_role.name
+resource "aws_iam_role_policy_attachment" "event-service_s3_policy" {
+  role       = aws_iam_role.event-service-master-server-s3-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
-resource "aws_iam_instance_profile" "eventserver_keyserver_master_profile" {
-  name = "eventserver-master-server-profile"
-  role = aws_iam_role.eventserver_keyserver_master_s3_role.name
+resource "aws_iam_instance_profile" "event-service-master-server-profile" {
+  name = "event-service-master-server-profile"
+  role = aws_iam_role.event-service-master-server-s3-role.name
 }
 
-resource "aws_instance" "kube_master" {
+resource "aws_instance" "kube-master" {
   ami                    = "ami-005fc0f236362e99f"
   instance_type          = "t3a.medium"
-  iam_instance_profile   = aws_iam_instance_profile.eventserver_keyserver_master_profile.name
-  vpc_security_group_ids = [aws_security_group.k8s_sec_gr.id]
+  iam_instance_profile   = aws_iam_instance_profile.event-service-master-server-profile.name
+  vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
   key_name               = "event"
-  subnet_id              = "subnet-042907c137a98e049"
+  subnet_id              = "subnet-042907c137a98e049" # select own subnet_id of us-east-1a
   availability_zone      = "us-east-1a"
-
   tags = {
     Name        = "kube-master"
     Project     = "tera-kube-ans"
@@ -101,14 +101,13 @@ resource "aws_instance" "kube_master" {
   }
 }
 
-resource "aws_instance" "worker_1" {
+resource "aws_instance" "worker-1" {
   ami                    = "ami-005fc0f236362e99f"
   instance_type          = "t3a.medium"
-  vpc_security_group_ids = [aws_security_group.k8s_sec_gr.id]
+  vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
   key_name               = "event"
-  subnet_id              = "subnet-042907c137a98e049"
+  subnet_id              = "subnet-042907c137a98e049" # select own subnet_id of us-east-1a
   availability_zone      = "us-east-1a"
-
   tags = {
     Name        = "worker-1"
     Project     = "tera-kube-ans"
@@ -118,14 +117,13 @@ resource "aws_instance" "worker_1" {
   }
 }
 
-resource "aws_instance" "worker_2" {
+resource "aws_instance" "worker-2" {
   ami                    = "ami-005fc0f236362e99f"
   instance_type          = "t3a.medium"
-  vpc_security_group_ids = [aws_security_group.k8s_sec_gr.id]
+  vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
   key_name               = "event"
-  subnet_id              = "subnet-042907c137a98e049"
+  subnet_id              = "subnet-042907c137a98e049" # select own subnet_id of us-east-1a
   availability_zone      = "us-east-1a"
-
   tags = {
     Name        = "worker-2"
     Project     = "tera-kube-ans"
@@ -135,20 +133,20 @@ resource "aws_instance" "worker_2" {
   }
 }
 
-output "kube_master_ip" {
-  value       = aws_instance.kube_master.public_ip
+output "kube-master-ip" {
+  value       = aws_instance.kube-master.public_ip
   sensitive   = false
-  description = "Public IP of the kube master"
+  description = "public ip of the kube-master"
 }
 
-output "worker_1_ip" {
-  value       = aws_instance.worker_1.public_ip
+output "worker-1-ip" {
+  value       = aws_instance.worker-1.public_ip
   sensitive   = false
-  description = "Public IP of worker-1"
+  description = "public ip of the worker-1"
 }
 
-output "worker_2_ip" {
-  value       = aws_instance.worker_2.public_ip
+output "worker-2-ip" {
+  value       = aws_instance.worker-2.public_ip
   sensitive   = false
-  description = "Public IP of worker-2"
+  description = "public ip of the worker-2"
 }
