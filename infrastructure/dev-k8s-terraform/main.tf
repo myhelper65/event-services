@@ -6,13 +6,14 @@ variable "sec_gr_k8s" {
   default = "eventserver-k8s-sec-group"
 }
 
-data "aws_vpc" "name" {
+data "aws_vpc" "default" {
   default = true
 }
 
 resource "aws_security_group" "k8s_sec_gr" {
   name   = var.sec_gr_k8s
-  vpc_id = data.aws_vpc.name.id
+  vpc_id = data.aws_vpc.default.id
+
   tags = {
     Name = var.sec_gr_k8s
   }
@@ -32,9 +33,9 @@ resource "aws_security_group" "k8s_sec_gr" {
   }
 
   ingress {
-    protocol    = "tcp"
     from_port   = 6443
     to_port     = 6443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -47,13 +48,13 @@ resource "aws_security_group" "k8s_sec_gr" {
 
   egress {
     from_port   = 0
-    protocol    = "-1"
     to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_iam_role" "eventserver_ansible_test_dev_keyserver_master_server_s3_role" {
+resource "aws_iam_role" "eventserver_keyserver_master_s3_role" {
   name               = "eventserver-master-server-role"
   assume_role_policy = <<EOF
 {
@@ -72,24 +73,25 @@ resource "aws_iam_role" "eventserver_ansible_test_dev_keyserver_master_server_s3
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "eventserver_ansible_test_dev_keyserver_s3_policy" {
-  role       = aws_iam_role.eventserver_ansible_test_dev_keyserver_master_server_s3_role.name
+resource "aws_iam_role_policy_attachment" "eventserver_keyserver_s3_policy" {
+  role       = aws_iam_role.eventserver_keyserver_master_s3_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
-resource "aws_iam_instance_profile" "eventserver_ansible_test_dev_keyserver_master_server_profile" {
+resource "aws_iam_instance_profile" "eventserver_keyserver_master_profile" {
   name = "eventserver-master-server-profile"
-  role = aws_iam_role.eventserver_ansible_test_dev_keyserver_master_server_s3_role.name
+  role = aws_iam_role.eventserver_keyserver_master_s3_role.name
 }
 
 resource "aws_instance" "kube_master" {
   ami                    = "ami-005fc0f236362e99f"
   instance_type          = "t3a.medium"
-  iam_instance_profile   = aws_iam_instance_profile.eventserver_ansible_test_dev_keyserver_master_server_profile.name
+  iam_instance_profile   = aws_iam_instance_profile.eventserver_keyserver_master_profile.name
   vpc_security_group_ids = [aws_security_group.k8s_sec_gr.id]
   key_name               = "event"
   subnet_id              = "subnet-042907c137a98e049"
   availability_zone      = "us-east-1a"
+
   tags = {
     Name        = "kube-master"
     Project     = "tera-kube-ans"
@@ -106,6 +108,7 @@ resource "aws_instance" "worker_1" {
   key_name               = "event"
   subnet_id              = "subnet-042907c137a98e049"
   availability_zone      = "us-east-1a"
+
   tags = {
     Name        = "worker-1"
     Project     = "tera-kube-ans"
@@ -122,6 +125,7 @@ resource "aws_instance" "worker_2" {
   key_name               = "event"
   subnet_id              = "subnet-042907c137a98e049"
   availability_zone      = "us-east-1a"
+
   tags = {
     Name        = "worker-2"
     Project     = "tera-kube-ans"
@@ -134,17 +138,17 @@ resource "aws_instance" "worker_2" {
 output "kube_master_ip" {
   value       = aws_instance.kube_master.public_ip
   sensitive   = false
-  description = "public ip of the kube-master"
+  description = "Public IP of the kube master"
 }
 
 output "worker_1_ip" {
   value       = aws_instance.worker_1.public_ip
   sensitive   = false
-  description = "public ip of the worker-1"
+  description = "Public IP of worker-1"
 }
 
 output "worker_2_ip" {
   value       = aws_instance.worker_2.public_ip
   sensitive   = false
-  description = "public ip of the worker-2"
+  description = "Public IP of worker-2"
 }
