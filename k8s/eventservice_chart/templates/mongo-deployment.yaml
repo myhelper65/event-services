@@ -23,7 +23,10 @@ spec:
         io.kompose.service: mongo
     spec:
       containers:
-        - image: '{{ .Values.IMAGE_TAG_MONGO }}'
+        -  name: mongo 
+           image: '{{ .Values.IMAGE_TAG_MONGO }}:{{ .Values.mongo.image.repository }}'
+           imagePullPolicy: {{ .Values.mongo.image.pullPolicy }}
+    imagePullPolicy: {{ .Values.mongo.image.pullPolicy }}
           livenessProbe:
             exec:
               command:

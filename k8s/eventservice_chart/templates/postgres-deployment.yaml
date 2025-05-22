@@ -28,7 +28,9 @@ spec:
               value: pluralsight
             - name: POSTGRES_USER
               value: pluralsight
-          image: '{{ .Values.IMAGE_TAG_POSTGRES }}'
+            - name: postgres
+              image: "{{ .Values.postgres.image.repository }}:{{ .Values.IMAGE_TAG_POSTGRES }}"
+              imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
           livenessProbe:
             exec:
               command:
