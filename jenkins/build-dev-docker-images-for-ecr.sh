@@ -1,2 +1,7 @@
-docker build  -t "${IMAGE_TAG_ADMIN_SERVER}" "${WORKSPACE}/spring-petclinic-admin-server"
-docker build  -t "${IMAGE_TAG_API_GATEWAY}" "${WORKSPACE}/spring-petclinic-api-gateway"
+
+
+# Build events-service Docker image
+docker build -t "${IMAGE_TAG_EVENTS}" "${WORKSPACE}/events-service"
+
+# Build registration-service Docker image
+docker build -t "${IMAGE_TAG_REGISTRATION}" "${WORKSPACE}/registration-service"

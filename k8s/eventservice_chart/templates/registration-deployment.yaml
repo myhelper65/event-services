@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml -o eventservice_chart/templates
+    kompose.image-pull-secret: regcred
+    kompose.version: 1.34.0 (cbf2835db)
+  labels:
+    io.kompose.service: registration
+  name: registration
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      io.kompose.service: registration
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml -o eventservice_chart/templates
+        kompose.image-pull-secret: regcred
+        kompose.version: 1.34.0 (cbf2835db)
+      labels:
+        io.kompose.service: registration
+    spec:
+      initContainers:
+        - name: wait-for-mongo
+          image: busybox
+          command: ['sh', '-c', 'until nc -z mongo 27017; do echo waiting for mongo; sleep 2; done;']
+        - name: wait-for-events
+          image: busybox
+          command: ['sh', '-c', 'until nc -z events 8081; do echo waiting for events; sleep 2; done;']
+      containers:
+        - env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: docker
+          image: '{{ .Values.IMAGE_TAG_REGISTRATION }}'
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - -f
+                - http://localhost:8080/actuator/health
+            failureThreshold: 3
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: registration
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      imagePullSecrets:
+        - name: regcred
+      restartPolicy: Always
