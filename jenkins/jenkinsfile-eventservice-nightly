@@ -110,15 +110,15 @@ pipeline {
                     // env.MASTER_PUBLIC_IP = sh(script:"aws ec2 describe-instances --region ${AWS_REGION} --filters Name=tag-value,Values=master Name=tag-value,Values=tera-kube-ans Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[PublicIpAddress] --output text", returnStdout:true).trim()
                     // while(true) {
                     //     try{
-                    //         sh "curl -s ${MASTER_PUBLIC_IP}:30001"
-                    //         echo "${APP_NAME} app is successfully deployed."
-                    //         break
+                    //         // sh "curl -s ${MASTER_PUBLIC_IP}:30001"
+                    //         // echo "${APP_NAME} app is successfully deployed."
+                    //         // break
                     //     }
                     //     catch(Exception){
                     //         echo "Could not connect to ${APP_NAME} app"
                     //         sleep(5)
-                        }
-                    }
+                    //     }
+                    // }
                 }
             }
         }
