@@ -29,6 +29,8 @@ spec:
         - name: wait-for-events
           image: busybox
           command: ['sh', '-c', 'until nc -z events 8081; do echo waiting for events; sleep 2; done;']
+      # The initContainers section is used to wait for the mongo and events services to be ready before starting the registration service.
+
       containers:
         - env:
             - name: SPRING_PROFILES_ACTIVE
