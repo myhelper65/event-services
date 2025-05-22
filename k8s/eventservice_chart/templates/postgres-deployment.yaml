@@ -23,22 +23,23 @@ spec:
         io.kompose.service: postgres
     spec:
       containers:
-        - env:
+        - name: postgres
+          image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
+          imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
+          env:
             - name: POSTGRES_PASSWORD
               value: pluralsight
             - name: POSTGRES_USER
               value: pluralsight
-            - name: postgres
-              image: "{{ .Values.postgres.image.repository }}:{{ .Values.IMAGE_TAG_POSTGRES }}"
-              imagePullPolicy: {{ .Values.postgres.image.pullPolicy }}
           livenessProbe:
             exec:
               command:
-                - pg_isready -U pluralsight
+                - pg_isready
+                - -U
+                - pluralsight
             failureThreshold: 5
             periodSeconds: 5
             timeoutSeconds: 3
-          name: postgres
           ports:
             - containerPort: 5432
               protocol: TCP
