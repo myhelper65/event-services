@@ -122,7 +122,7 @@ resource "aws_instance" "worker-2" {
   instance_type          = "t3a.medium"
   vpc_security_group_ids = [aws_security_group.k8s-sec-gr.id]
   key_name               = "event"
-  subnet_id              = "subnet-042907c137a98e049" # select own subnet_id of us-east-1a
+  subnet_id              = "subnet-042907c137a98e049" # select our own subnet_id of us-east-1a
   availability_zone      = "us-east-1a"
   tags = {
     Name        = "worker-2"
