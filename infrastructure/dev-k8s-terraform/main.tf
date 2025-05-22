@@ -54,7 +54,7 @@ resource "aws_security_group" "k8s_sec_gr" {
 }
 
 resource "aws_iam_role" "eventserver_ansible_test_dev_keyserver_master_server_s3_role" {
-  name = "eventserver-ansible-test-dev.keyserver-master-server-role"
+  name               = "eventserver-ansible-test-dev.keyserver-master-server-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
