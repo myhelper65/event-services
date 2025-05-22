@@ -13,16 +13,16 @@
       src: $JENKINS_HOME/.docker/config.json
       dest: /home/ubuntu/.docker/config.json
 
-  - name: deploy petclinic application
+  - name: deploy eventservice application
     shell: |
       helm plugin install https://github.com/hypnoglow/helm-s3.git
-      kubectl create ns petclinic-dev
-      kubectl delete secret regcred -n petclinic-dev || true
-      kubectl create secret generic regcred -n petclinic-dev \
+      kubectl create ns eventservice-dev
+      kubectl delete secret regcred -n eventservice-dev || true
+      kubectl create secret generic regcred -n eventservice-dev \
         --from-file=.dockerconfigjson=/home/ubuntu/.docker/config.json \
         --type=kubernetes.io/dockerconfigjson
-      AWS_REGION=$AWS_REGION helm repo add stable-petclinic s3://petclinic-helm-charts-<put-your-name>/stable/myapp/
+      AWS_REGION=$AWS_REGION helm repo add stable-eventservice s3://eventservice-helm-charts-tecitlab.org/stable/myapp/
       AWS_REGION=$AWS_REGION helm repo update
       AWS_REGION=$AWS_REGION helm upgrade --install \
-        petclinic-app-release stable-petclinic/petclinic_chart --version ${BUILD_NUMBER} \
-        --namespace petclinic-dev
+        eventservice-app-release stable-eventservice/eventservice_chart --version ${BUILD_NUMBER} \
+        --namespace eventservice-dev
