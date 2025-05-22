@@ -103,32 +103,32 @@ pipeline {
             }
         }     
 
-        // stage('Test the Application Deployment'){
-        //     steps {
-        //         echo "Check if the ${APP_NAME} app is ready or not"
-        //         script {
-        //             // env.MASTER_PUBLIC_IP = sh(script:"aws ec2 describe-instances --region ${AWS_REGION} --filters Name=tag-value,Values=master Name=tag-value,Values=tera-kube-ans Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[PublicIpAddress] --output text", returnStdout:true).trim()
-        //             // while(true) {
-        //             //     try{
-        //             //         sh "curl -s ${MASTER_PUBLIC_IP}:30001"
-        //             //         echo "${APP_NAME} app is successfully deployed."
-        //             //         break
-        //             //     }
-        //             //     catch(Exception){
-        //             //         echo "Could not connect to ${APP_NAME} app"
-        //             //         sleep(5)
-        //                 }
-        //             }
-        //         }
-            // }
-//         }
+        stage('Test the Application Deployment'){
+            steps {
+                echo "Check if the ${APP_NAME} app is ready or not"
+                script {
+                    // env.MASTER_PUBLIC_IP = sh(script:"aws ec2 describe-instances --region ${AWS_REGION} --filters Name=tag-value,Values=master Name=tag-value,Values=tera-kube-ans Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[PublicIpAddress] --output text", returnStdout:true).trim()
+                    // while(true) {
+                    //     try{
+                    //         sh "curl -s ${MASTER_PUBLIC_IP}:30001"
+                    //         echo "${APP_NAME} app is successfully deployed."
+                    //         break
+                    //     }
+                    //     catch(Exception){
+                    //         echo "Could not connect to ${APP_NAME} app"
+                    //         sleep(5)
+                        }
+                    }
+                }
+            }
+        }
 
-//         stage('Run QA Automation Tests'){
-//             steps {
-//                 echo "Run the Selenium Functional Test on QA Environment"
-//                 sh 'ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --extra-vars "workspace=${WORKSPACE} master_public_ip=${MASTER_PUBLIC_IP}" ./ansible/playbooks/pb_run_selenium_jobs.yaml'
-//             }
-//         }
+        stage('Run QA Automation Tests'){
+            steps {
+                echo "Run the Selenium Functional Test on QA Environment"
+                // sh 'ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --extra-vars "workspace=${WORKSPACE} master_public_ip=${MASTER_PUBLIC_IP}" ./ansible/playbooks/pb_run_selenium_jobs.yaml'
+            }
+        }
  }
 
     post {
