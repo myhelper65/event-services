@@ -1,40 +1,6 @@
-# # _chart/values-template.yaml
-
-# IMAGE_TAG_EVENTS: "${IMAGE_TAG_EVENTS}"
-# IMAGE_TAG_REGISTRATION: "${IMAGE_TAG_REGISTRATION}"
-# IMAGE_TAG_MONGO: "${IMAGE_TAG_MONGO}"
-# IMAGE_TAG_POSTGRES: "${IMAGE_TAG_POSTGRES}"
-
 # _chart/values-template.yaml
 
-# IMAGE_TAG_EVENTS: "${IMAGE_TAG_EVENTS}"
-# IMAGE_TAG_REGISTRATION: "${IMAGE_TAG_REGISTRATION}"
-# IMAGE_TAG_MONGO: "${IMAGE_TAG_MONGO}"
-# IMAGE_TAG_POSTGRES: "${IMAGE_TAG_POSTGRES}"
-
-postgres:
-  image:
-    repository: "postgres"
-    tag: "${IMAGE_TAG_POSTGRES}"
-    pullPolicy: "IfNotPresent"
-
-mongo:
-  image:
-    repository: "mongo"
-    tag: "${IMAGE_TAG_MONGO}"
-    pullPolicy: "IfNotPresent"
-
-eventservice:
-  image:
-    repository: "533266982090.dkr.ecr.us-east-1.amazonaws.com/us-east-1"  # Add the repository
-    tag: "${IMAGE_TAG_EVENTS}"
-    pullPolicy: "IfNotPresent"  # Add the pull policy
-
-registrationservice:
-  image:
-    repository: "533266982090.dkr.ecr.us-east-1.amazonaws.com/us-east-1;"  # Add the repository
-    tag: "${IMAGE_TAG_REGISTRATION}"
-    pullPolicy: "IfNotPresent"  # Add the pull policy
-
-imagePullSecrets:
-  - name: regcred  # Ensure this is included
+IMAGE_TAG_EVENTS: "${IMAGE_TAG_EVENTS}"
+IMAGE_TAG_REGISTRATION: "${IMAGE_TAG_REGISTRATION}"
+IMAGE_TAG_MONGO: "${IMAGE_TAG_MONGO}"
+IMAGE_TAG_POSTGRES: "${IMAGE_TAG_POSTGRES}"

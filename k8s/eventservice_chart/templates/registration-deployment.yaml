@@ -33,7 +33,7 @@ spec:
         - env:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
-          image: "{{ .Values.registration.image.repository }}:{{ .Values.registration.image.tag }}"
+          image: "{{ .Values.registration.image.repository }}:{{ .Values.image.tag.registration}}"
           imagePullPolicy: {{ .Values.registration.image.pullPolicy }}
           livenessProbe:
             exec:
@@ -47,7 +47,7 @@ spec:
             timeoutSeconds: 10
           name: registration
           ports:
-            - containerPort: 8080
+            - containerPort: 8085
               protocol: TCP
       imagePullSecrets:
         - name: regcred
