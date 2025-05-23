@@ -29,13 +29,13 @@ spec:
         - name: wait-for-events
           image: busybox
           command: ['sh', '-c', 'until nc -z events 8081; do echo waiting for events; sleep 2; done;']
-      # The initContainers section is used to wait for the mongo and events services to be ready before starting the registration service.
-
       containers:
-        - env:
+        - name: registration
+          env:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
-          image: '{{ .Values.IMAGE_TAG_REGISTRATION }}'
+          image: "{{ .Values.registration.image.repository }}:{{ .Values.registration.image.tag }}"
+          imagePullPolicy: {{ .Values.registration.image.pullPolicy }}
           livenessProbe:
             exec:
               command:
@@ -46,7 +46,6 @@ spec:
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 10
-          name: registration
           ports:
             - containerPort: 8080
               protocol: TCP

@@ -134,3 +134,5 @@ postgres:
     tag: "15"
     pullPolicy: IfNotPresent
 
+imagePullSecrets:
+  - name: regcred

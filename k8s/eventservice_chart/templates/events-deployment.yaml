@@ -23,15 +23,16 @@ spec:
         io.kompose.service: events
     spec:
       initContainers:
-          - name: wait-for-postgres
-            image: busybox
-            command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;']
-
+        - name: wait-for-postgres
+          image: busybox
+          command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
-        - env:
+        - name: events
+          env:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
-          image: '{{ .Values.IMAGE_TAG_EVENTS }}'
+          image: "{{ .Values.events.image.repository }}:{{ .Values.events.image.tag }}"
+          imagePullPolicy: {{ .Values.events.image.pullPolicy }}
           livenessProbe:
             exec:
               command:
@@ -40,7 +41,6 @@ spec:
             initialDelaySeconds: 120
             periodSeconds: 30
             timeoutSeconds: 10
-          name: events
           ports:
             - containerPort: 8081
               protocol: TCP
