@@ -78,14 +78,14 @@ postgres:
     pullPolicy: IfNotPresent
 
 # Add events and registration image configurations
-events:
-  image:
-    repository: 533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev
-    tag: latest  # You can set this to a specific tag or use "latest"
-    pullPolicy: Always
+# events:
+#   image:
+#     repository: 533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev
+#     tag: latest  # You can set this to a specific tag or use "latest"
+#     pullPolicy: Always
 
-registration:
-  image:
-    repository: 533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev
-    tag: latest  # You can set this to a specific tag or use "latest"
-    pullPolicy: Always
+# registration:
+#   image:
+#     repository: 533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev
+#     tag: latest  # You can set this to a specific tag or use "latest"
+#     pullPolicy: Always
