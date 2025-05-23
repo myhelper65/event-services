@@ -1,6 +1,26 @@
-# _chart/values-template.yaml
+# # _chart/values-template.yaml
 
-IMAGE_TAG_EVENTS: "${IMAGE_TAG_EVENTS}"
-IMAGE_TAG_REGISTRATION: "${IMAGE_TAG_REGISTRATION}"
-IMAGE_TAG_MONGO: "${IMAGE_TAG_MONGO}"
-IMAGE_TAG_POSTGRES: "${IMAGE_TAG_POSTGRES}"
+# IMAGE_TAG_EVENTS: "${IMAGE_TAG_EVENTS}"
+# IMAGE_TAG_REGISTRATION: "${IMAGE_TAG_REGISTRATION}"
+# IMAGE_TAG_MONGO: "${IMAGE_TAG_MONGO}"
+# IMAGE_TAG_POSTGRES: "${IMAGE_TAG_POSTGRES}"
+
+postgres:
+  image:
+    repository: "postgres"
+    tag: "${IMAGE_TAG_POSTGRES}"
+    pullPolicy: "IfNotPresent"
+
+mongo:
+  image:
+    repository: "mongo"
+    tag: "${IMAGE_TAG_MONGO}"
+    pullPolicy: "IfNotPresent"
+
+eventservice:
+  image:
+    tag: "${IMAGE_TAG_EVENTS}"
+
+registrationservice:
+  image:
+    tag: "${IMAGE_TAG_REGISTRATION}"
