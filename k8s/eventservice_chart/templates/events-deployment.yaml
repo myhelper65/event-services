@@ -27,8 +27,7 @@ spec:
           image: busybox
           command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
-        - name: events
-          env:
+        - env:
             - name: SPRING_PROFILES_ACTIVE
               value: docker
           image: "{{ .Values.events.image.repository }}:{{ .Values.events.image.tag }}"
@@ -41,6 +40,7 @@ spec:
             initialDelaySeconds: 120
             periodSeconds: 30
             timeoutSeconds: 10
+          name: events
           ports:
             - containerPort: 8081
               protocol: TCP
