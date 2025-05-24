@@ -5,7 +5,7 @@ ENV SPRING_PROFILES_ACTIVE docker
 COPY ./target/*.jar /app.jar
 
 # Expose the application port
-EXPOSE 8080
+EXPOSE 8085
 
 # Secure and optimized Java entrypoint
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app.jar"]
