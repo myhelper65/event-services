@@ -16,7 +16,7 @@
   - name: Copy Helm values.yaml to EC2
     become: yes
     copy:
-      src: k8s/eventservice_chart/values.yaml     # ensure this path is relative to where you call ansible-playbook
+      src: ../../k8s/eventservice_chart/values.yaml   # ensure this path is relative to where you call ansible-playbook
       dest: /home/ubuntu/values.yaml
 
   - name: deploy eventservice application
