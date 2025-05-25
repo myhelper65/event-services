@@ -13,7 +13,7 @@
       src: $JENKINS_HOME/.docker/config.json
       dest: /home/ubuntu/.docker/config.json
 
-  - name: deploy eventservice application
+  - wname: deploy eventservice application
     shell: |
       helm plugin install https://github.com/hypnoglow/helm-s3.git
       kubectl create ns eventservice-dev
