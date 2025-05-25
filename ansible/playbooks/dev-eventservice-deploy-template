@@ -7,13 +7,19 @@
       state: directory
       mode: '0755'
 
-  - name: copy the docker config file
+  - name: Copy the Docker config file
     become: yes
-    copy: 
-      src: $JENKINS_HOME/.docker/config.json
+    copy:
+      src: /var/lib/jenkins/.docker/config.json   # or use a variable
       dest: /home/ubuntu/.docker/config.json
 
-  - wname: deploy eventservice application
+  - name: Copy Helm values.yaml to EC2
+    become: yes
+    copy:
+      src: k8s/eventservice_chart/values.yaml     # ensure this path is relative to where you call ansible-playbook
+      dest: /home/ubuntu/values.yaml
+
+  - name: deploy eventservice application
     shell: |
       helm plugin install https://github.com/hypnoglow/helm-s3.git
       kubectl create ns eventservice-dev
