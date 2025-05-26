@@ -20,7 +20,6 @@
       dest: /home/ubuntu/values.yaml
 
   - name: deploy eventservice application
-    become: yes
     shell: |
       helm plugin install https://github.com/hypnoglow/helm-s3.git
       kubectl create ns eventservice-dev
