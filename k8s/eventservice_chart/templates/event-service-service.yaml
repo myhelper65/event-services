@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "eventservice_chart.fullname" . }}-event-service
+  name: {{ include "eventservice_chart.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "eventservice_chart.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
