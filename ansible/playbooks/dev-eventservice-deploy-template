@@ -1,7 +1,9 @@
 - hosts: role_master
   vars:
-    IMAGE_TAG_MONGO: "533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev:mongo-v0.0.1-SNAPSHOT-b30"
-    IMAGE_TAG_POSTGRES: "533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev:postgres-v0.0.1-SNAPSHOT-b30"
+    # You can keep default dummy values here if you want,
+    # or better pass these as extra vars at runtime.
+    IMAGE_TAG_MONGO: ""
+    IMAGE_TAG_POSTGRES: ""
 
   tasks:
     - name: Create .docker folder
@@ -16,11 +18,13 @@
         src: /var/lib/jenkins/.docker/config.json
         dest: /home/ubuntu/.docker/config.json
 
-    - name: Copy Helm values.yaml to EC2
-      become: yes
-      copy:
+    - name: Template Helm values.yaml with dynamic image tags
+      template:
         src: ../../k8s/eventservice_chart/values-template.yaml
-        dest: /home/ubuntu/values-template.yaml
+        dest: /home/ubuntu/values.yaml
+      vars:
+        IMAGE_TAG_MONGO: "{{ IMAGE_TAG_MONGO }}"
+        IMAGE_TAG_POSTGRES: "{{ IMAGE_TAG_POSTGRES }}"
 
     - name: deploy eventservice application
       shell: |
@@ -40,5 +44,4 @@
         AWS_REGION=us-east-1 helm upgrade --install eventservice-app-release stable-eventservice/eventservice_chart \
           --version 23 \
           --namespace eventservice-dev \
-          --set mongo.image={{ IMAGE_TAG_MONGO }} \
-          --set postgres.image={{ IMAGE_TAG_POSTGRES }}
+          -f /home/ubuntu/values.yaml
