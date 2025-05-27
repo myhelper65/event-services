@@ -1,41 +1,44 @@
 - hosts: role_master
+  vars:
+    IMAGE_TAG_MONGO: "533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev:mongo-v0.0.1-SNAPSHOT-b30"
+    IMAGE_TAG_POSTGRES: "533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev:postgres-v0.0.1-SNAPSHOT-b30"
+
   tasks:
+    - name: Create .docker folder
+      file:
+        path: /home/ubuntu/.docker
+        state: directory
+        mode: '0755'
 
-  - name: Create .docker folder
-    file:
-      path: /home/ubuntu/.docker
-      state: directory
-      mode: '0755'
+    - name: Copy the Docker config file
+      become: yes
+      copy:
+        src: /var/lib/jenkins/.docker/config.json
+        dest: /home/ubuntu/.docker/config.json
 
-  - name: Copy the Docker config file
-    become: yes
-    copy:
-      src: /var/lib/jenkins/.docker/config.json   # or use a variable
-      dest: /home/ubuntu/.docker/config.json
+    - name: Copy Helm values.yaml to EC2
+      become: yes
+      copy:
+        src: ../../k8s/eventservice_chart/values-template.yaml
+        dest: /home/ubuntu/values-template.yaml
 
-  - name: Copy Helm values.yaml to EC2
-    become: yes
-    copy:
-      src: ../../k8s/eventservice_chart/values-template.yaml   # ensure this path is relative to where you call ansible-playbook
-      dest: /home/ubuntu/values-template.yaml
+    - name: deploy eventservice application
+      shell: |
+        helm plugin install https://github.com/hypnoglow/helm-s3.git
+        kubectl create ns eventservice-dev || true
+        kubectl delete secret regcred -n eventservice-dev || true
+        kubectl create secret generic regcred -n eventservice-dev \
+          --from-file=.dockerconfigjson=/home/ubuntu/.docker/config.json \
+          --type=kubernetes.io/dockerconfigjson
 
-  - name: deploy eventservice application
-    shell: |
-      helm plugin install https://github.com/hypnoglow/helm-s3.git
-      kubectl create ns eventservice-dev || true
-      kubectl delete secret regcred -n eventservice-dev || true
-      kubectl create secret generic regcred -n eventservice-dev \
-        --from-file=.dockerconfigjson=/home/ubuntu/.docker/config.json \
-        --type=kubernetes.io/dockerconfigjson
+        AWS_REGION=us-east-1 helm repo add stable-eventservice s3://eventservice-helm-charts-tecitlab.org/stable/myapp/
+        AWS_REGION=us-east-1 helm repo update
 
-      AWS_REGION=us-east-1 helm repo add stable-eventservice s3://eventservice-helm-charts-tecitlab.org/stable/myapp/
-      AWS_REGION=us-east-1 helm repo update
+        echo "Mongo Image: {{ IMAGE_TAG_MONGO }}"
+        echo "Postgres Image: {{ IMAGE_TAG_POSTGRES }}"
 
-      echo "Mongo Image: {{ IMAGE_TAG_MONGO }}"
-      echo "Postgres Image: {{ IMAGE_TAG_POSTGRES }}"
-
-      AWS_REGION=us-east-1 helm upgrade --install eventservice-app-release stable-eventservice/eventservice_chart \
-        --version 23 \
-        --namespace eventservice-dev \
-        --set mongo.image={{ IMAGE_TAG_MONGO }} \
-        --set postgres.image={{ IMAGE_TAG_POSTGRES }}
+        AWS_REGION=us-east-1 helm upgrade --install eventservice-app-release stable-eventservice/eventservice_chart \
+          --version 23 \
+          --namespace eventservice-dev \
+          --set mongo.image={{ IMAGE_TAG_MONGO }} \
+          --set postgres.image={{ IMAGE_TAG_POSTGRES }}
