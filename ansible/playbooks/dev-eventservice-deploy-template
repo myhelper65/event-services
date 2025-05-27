@@ -31,11 +31,11 @@
       AWS_REGION=us-east-1 helm repo add stable-eventservice s3://eventservice-helm-charts-tecitlab.org/stable/myapp/
       AWS_REGION=us-east-1 helm repo update
 
-      echo "Mongo Image: {{ image_tag_mongo }}"
-      echo "Postgres Image: {{ image_tag_postgres }}"
+      echo "Mongo Image: {{ IMAGE_TAG_MONGO }}"
+      echo "Postgres Image: {{ IMAGE_TAG_POSTGRES }}"
 
       AWS_REGION=us-east-1 helm upgrade --install eventservice-app-release stable-eventservice/eventservice_chart \
         --version 23 \
         --namespace eventservice-dev \
-        --set mongo.image={{ image_tag_mongo }} \
-        --set postgres.image={{ image_tag_postgres }}
+        --set mongo.image={{ IMAGE_TAG_MONGO }} \
+        --set postgres.image={{ IMAGE_TAG_POSTGRES }}
