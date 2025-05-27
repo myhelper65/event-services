@@ -7,10 +7,12 @@ export IMAGE_TAG_REGISTRATION="${ECR_REGISTRY}/${APP_REPO_NAME}:registration-ser
 export IMAGE_TAG_MONGO="533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev:mongo-v${MVN_VERSION}-b${BUILD_NUMBER}"
 export IMAGE_TAG_POSTGRES="533266982090.dkr.ecr.us-east-1.amazonaws.com/eventservice-repo/eventservice-app-dev:postgres-v${MVN_VERSION}-b${BUILD_NUMBER}"
 
-helm upgrade --install eventservice-app-release stable-eventservice/eventservice_chart \
+AWS_REGION=us-east-1 helm upgrade --install  eventservice-app-release stable-eventservice/eventservice_chart \
+  --version 23 \
   --namespace eventservice-dev \
   --set mongo.image="${IMAGE_TAG_MONGO}" \
   --set postgres.image="${IMAGE_TAG_POSTGRES}"
+
 
 
 # Debug output
