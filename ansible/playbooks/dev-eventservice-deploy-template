@@ -27,6 +27,17 @@
       kubectl create secret generic regcred -n eventservice-dev \
         --from-file=.dockerconfigjson=/home/ubuntu/.docker/config.json \
         --type=kubernetes.io/dockerconfigjson
+        
+       export IMAGE_TAG_MONGO="{{ image_tag_mongo }}"
+       export IMAGE_TAG_POSTGRES="{{ image_tag_postgres }}"
+       echo "Mongo Image: $IMAGE_TAG_MONGO"
+       echo "Postgres Image: $IMAGE_TAG_POSTGRES"
+       AWS_REGION=us-east-1 helm upgrade --install eventservice-app-release stable-eventservice/eventservice_chart \
+      --version 23 \
+      --namespace eventservice-dev \
+      --set mongo.image=$IMAGE_TAG_MONGO \
+      --set postgres.image=$IMAGE_TAG_POSTGRES
+
       AWS_REGION=$AWS_REGION helm repo add stable-eventservice s3://eventservice-helm-charts-tecitlab.org/stable/myapp/
       AWS_REGION=$AWS_REGION helm repo update
       AWS_REGION=$AWS_REGION helm upgrade --install \
