@@ -9,9 +9,11 @@ metadata:
     io.kompose.service: registration
   name: registration
 spec:
-  ports:
-    - name: "8086"
-      port: 8086
-      targetPort: 8080
+  type: NodePort
   selector:
     io.kompose.service: registration
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
