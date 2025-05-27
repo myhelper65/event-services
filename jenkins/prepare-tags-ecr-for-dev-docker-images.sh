@@ -9,7 +9,8 @@ export IMAGE_TAG_REGISTRATION="${ECR_REGISTRY}/${APP_REPO_NAME}:registration-ser
 ECR_REGISTRY=$(echo "$IMAGE_TAG_REGISTRATION" | cut -d '/' -f1)
 APP_REPO_NAME=$(echo "$IMAGE_TAG_REGISTRATION" | cut -d '/' -f2 | cut -d ':' -f1)
 BUILD_NUMBER=$(echo "$IMAGE_TAG_REGISTRATION" | sed -E 's/.*-b([0-9]+)$/\1/')
-
+ docker pull mongo:5.0
+ docker pull postgres:14
 # Now use them to export MONGO/POSTGRES tags
 export IMAGE_TAG_MONGO="${ECR_REGISTRY}/${APP_REPO_NAME}:mongo-b${BUILD_NUMBER}"
 export IMAGE_TAG_POSTGRES="${ECR_REGISTRY}/${APP_REPO_NAME}:postgres-b${BUILD_NUMBER}"
