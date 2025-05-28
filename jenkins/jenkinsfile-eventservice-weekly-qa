@@ -22,10 +22,10 @@ pipeline {
                 echo 'Preparing Tags for Docker Images'
                 script {
                     MVN_VERSION=sh(script:'. ${WORKSPACE}/events-service/target/maven-archiver/pom.properties && echo $version', returnStdout:true).trim()
-                    export IMAGE_TAG_EVENTS="${ECR_REGISTRY}/${APP_REPO_NAME}:events-service-qa-v${MVN_VERSION}-b${BUILD_NUMBER}"
+                    env.IMAGE_TAG_EVENTS="${ECR_REGISTRY}/${APP_REPO_NAME}:events-service-qa-v${MVN_VERSION}-b${BUILD_NUMBER}"
 
                     MVN_VERSION=sh(script:'. ${WORKSPACE}/registration-service/target/maven-archiver/pom.properties && echo $version', returnStdout:true).trim()
-                    export IMAGE_TAG_REGISTRATION="${ECR_REGISTRY}/${APP_REPO_NAME}:registration-service-qa-v${MVN_VERSION}-b${BUILD_NUMBER}"
+                    env.IMAGE_TAG_REGISTRATION="${ECR_REGISTRY}/${APP_REPO_NAME}:registration-service-qa-v${MVN_VERSION}-b${BUILD_NUMBER}"
 
                 }
             }
