@@ -4,17 +4,20 @@ metadata:
   name: registration-ingress
   namespace: eventservice-qa
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing           # or internal if you want
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:533266982090:certificate/addf20d3-ba29-4fd9-a808-e64ff4e3c38b
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
 spec:
   rules:
-  - host: tecitlab.org
-    http:
-      paths:
-      - path: /registrations(/|$)(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: registration
-            port:
-              number: 8080
+    - host: tecitlab.org
+      http:
+        paths:
+          - path: /registrations
+            pathType: Prefix
+            backend:
+              service:
+                name: registration
+                port:
+                  number: 8080
