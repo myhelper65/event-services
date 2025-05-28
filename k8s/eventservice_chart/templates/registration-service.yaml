@@ -6,12 +6,12 @@ metadata:
     kompose.image-pull-secret: regcred
     kompose.version: 1.34.0 (cbf2835db)
   labels:
-    io.kompose.service: registration
+    app: registration   # <-- use the same label as deployment
   name: registration
 spec:
   type: NodePort
   selector:
-    io.kompose.service: registration
+    app: registration   # <-- must match deployment pod labels
   ports:
     - name: http
       port: 8080

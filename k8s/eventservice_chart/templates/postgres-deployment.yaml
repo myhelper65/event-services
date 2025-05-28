@@ -23,23 +23,25 @@ spec:
         io.kompose.service: postgres
     spec:
       containers:
-        - env:
-            - name: POSTGRES_PASSWORD
-              value: pluralsight
-            - name: POSTGRES_USER
-              value: pluralsight
-          image: '{{ .Values.IMAGE_TAG_POSTGRES }}'
-          livenessProbe:
-            exec:
-              command:
-                - pg_isready -U pluralsight
-            failureThreshold: 5
-            periodSeconds: 5
-            timeoutSeconds: 3
-          name: postgres
+        - name: postgres
+          image: postgres:14
           ports:
             - containerPort: 5432
               protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: pluralsight
+            - name: POSTGRES_PASSWORD
+              value: pluralsight
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - pluralsight
+            failureThreshold: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
       imagePullSecrets:
         - name: regcred
       restartPolicy: Always

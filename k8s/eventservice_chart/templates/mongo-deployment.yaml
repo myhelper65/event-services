@@ -23,19 +23,21 @@ spec:
         io.kompose.service: mongo
     spec:
       containers:
-        - image: '{{ .Values.IMAGE_TAG_MONGO }}'
-          livenessProbe:
-            exec:
-              command:
-                - mongosh --eval "db.adminCommand('ping')"
-            failureThreshold: 5
-            initialDelaySeconds: 40
-            periodSeconds: 10
-            timeoutSeconds: 5
-          name: mongo
+        - name: mongo
+          image: mongo:5.0
           ports:
             - containerPort: 27017
               protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
       imagePullSecrets:
         - name: regcred
       restartPolicy: Always

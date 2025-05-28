@@ -6,12 +6,13 @@ metadata:
     kompose.image-pull-secret: regcred
     kompose.version: 1.34.0 (cbf2835db)
   labels:
-    io.kompose.service: events
+    app: events  # <- standardized to match Deployment
   name: events
 spec:
+  type: ClusterIP
+  selector:
+    app: events  # <- must match Deployment pod labels
   ports:
-    - name: "8081"
+    - name: http
       port: 8081
       targetPort: 8081
-  selector:
-    io.kompose.service: events
